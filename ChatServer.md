@@ -1,5 +1,7 @@
 # Mission: create a chat server
 
+[Quick link to `Swift-NIO` documentation](https://apple.github.io/swift-nio/docs/current/NIO/index.html)
+
 We're going to build a simple chat server that can run on macOS and Linux, using Swift-NIO.
 
 The server will accept commands from clients applications that connect to it. It holds the chat rooms, dispatches the messages sent by clients, and supports direct messages between clients.
@@ -29,14 +31,14 @@ Let's discuss Swift-NIO architecture! The introduction on the repository states 
 
 I'll go with you over the main concepts and building blocks in Swift-NIO:
 
-* `EventLoop` and `EventLoopGroup`: 
-* `Channel`, a protocol
-* `ChannelHandler` and `ChannelPipeline`: single-purpose data handlers and pipelines to assemble them together
-* `ServerBootstrap`, `ClientBootstrap` and `DatagramBootstrap`: helpers to quickly get setup for a server or client
-* `EventLoopFuture` and `EventLoopPromise`, asynchronous production of results
-* `ByteBuffer`, high performance contiguous storage
+* [`EventLoop`](https://apple.github.io/swift-nio/docs/current/NIO/Protocols/EventLoop.html) and [`EventLoopGroup`](https://apple.github.io/swift-nio/docs/current/NIO/Protocols/EventLoopGroup.html): the main processing loops for Swift-NIO
+* [`Channel`](https://apple.github.io/swift-nio/docs/current/NIO/Protocols/Channel.html), a protocol
+* `ChannelHandler`, [`ChannelInboundHandler`](https://apple.github.io/swift-nio/docs/current/NIO/Protocols/ChannelInboundHandler.html), [`ChannelOutboundHandler`](https://apple.github.io/swift-nio/docs/current/NIO/Protocols/ChannelOutboundHandler.html) and [`ChannelPipeline`](https://apple.github.io/swift-nio/docs/current/NIO/Classes/ChannelPipeline.html): single-purpose data handlers and pipelines to assemble them together
+* [`ServerBootstrap`](https://apple.github.io/swift-nio/docs/current/NIO/Classes/ServerBootstrap.html), [`ClientBootstrap`](https://apple.github.io/swift-nio/docs/current/NIO/Classes/ClientBootstrap.html) and [`DatagramBootstrap`](https://apple.github.io/swift-nio/docs/current/NIO/Classes/DatagramBootstrap.html): helpers to quickly get setup for a server or client
+* [`EventLoopFuture`](https://apple.github.io/swift-nio/docs/current/NIO/Classes/EventLoopFuture.html) and [`EventLoopPromise`](https://apple.github.io/swift-nio/docs/current/NIO/Structs/EventLoopPromise.html), asynchronous production of results
+* [`ByteBuffer`](https://apple.github.io/swift-nio/docs/current/NIO/Structs/ByteBuffer.html), high performance contiguous storage
 
-In this introduction and simple server development, we'll focus on the 5 first items, and will make light use of `Future` to setup the server.
+In this introduction and simple server development, we'll focus on the 5 first items, and may make light use of `EventLoopFuture` to bootstrap the server.
 
 Let me go over Swift-NIO's model, then we'll kick in the first task.
 
@@ -65,12 +67,12 @@ An easy one to get started with the actual server. Open `ServerMain.swift` and c
 
 ## Task 4: boostrap the server
 
-This one is more involved as you'll have to understand what `ServerBoostrap` does and how to use it. This all happens in `ServerMain.swift`.
+This one is more involved as you'll have to understand what [`ServerBoostrap`](https://apple.github.io/swift-nio/docs/current/NIO/Classes/ServerBootstrap.html) does and how to use it. This all happens in `ServerMain.swift`.
 
 Hints at what you want to do:
 
-* Create a `ServerBootstrap` for your EventLoopGroup
-* Set options for the main server channel (the one that listens to client connections). Look into the various `ChannelOptions` and pick the ones you need
+* Create a [`ServerBootstrap`](https://apple.github.io/swift-nio/docs/current/NIO/Classes/ServerBootstrap.html) for your [`EventLoopGroup`](https://apple.github.io/swift-nio/docs/current/NIO/Protocols/EventLoopGroup.html)
+* Set options for the main server channel (the one that listens to client connections). Look into the various [`ChannelOption`](https://github.com/apple/swift-nio/blob/master/Sources/NIO/ChannelOption.swift)s and pick the ones you need
 * Setup a child channel initializer which will configure the processing pipeline for client connections. At a minimum, you'll want to decode JSON to actual `ClientCommand` instances,
 * Add the second channel handler which will log the decoded client commands
 
