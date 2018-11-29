@@ -16,7 +16,7 @@ import ChatCommon
 public final class ServerChatRoomsHandler: ChannelInboundHandler, ChannelOutboundHandler {
 
 	public typealias InboundIn = ClientCommand
-	public typealias OutboundIn = ServerMessage
+	public typealias OutboundOut = ServerMessage
 
 	// storage for our helper functions
 	private var online = Set<ChatUser>()
@@ -34,6 +34,10 @@ public final class ServerChatRoomsHandler: ChannelInboundHandler, ChannelOutboun
 	* Helper functions
 	*
 	*/
+	private func push(_ data: ServerMessage, to channel: Channel) {
+		// send a ServerMessage to one user
+		channel.writeAndFlush(wrapOutboundOut(data), promise: nil)
+	}
 
 	private func onlineUser(_ channel: Channel) -> ChatUser? {
 		let uniqueIdentifier = ObjectIdentifier(channel)
