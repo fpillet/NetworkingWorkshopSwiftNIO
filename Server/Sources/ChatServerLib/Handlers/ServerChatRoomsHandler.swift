@@ -29,10 +29,6 @@ public final class ServerChatRoomsHandler {
 
 	// TODO: handle the case of a disconnected client to update the list of online users
 
-	private func push(_ data: ServerMessage, to channel: Channel) {
-		// TODO: send a ServerMessage to one user
-	}
-
 	/*
  	 * Helper functions -- Use them to speed up your development!
  	 *
@@ -43,47 +39,26 @@ public final class ServerChatRoomsHandler {
 	}
 
 	private func userConnected(name: String, channel: Channel) {
-		let uniqueIdentifier = ObjectIdentifier(channel)
-		online.insert(ChatUser(name: name, channel: channel, uniqueIdentifier: uniqueIdentifier))
-		listRooms(channel)
-		for user in online {
-			listUsers(user.channel)
-		}
+		// TODO: upon connection, user should receivce the list of rooms and the list of connected users
 	}
 
 	private func userDisconnected(_ channel: Channel) {
-		if let user = onlineUser(channel) {
-			online.remove(user)
-			for user in online {
-				listUsers(user.channel)
-			}
-		}
+		// TODO: update the list of connected users for all remaining users
 	}
 
 	private func listRooms(_ channel: Channel) {
-		push(ServerMessage.rooms(rooms.sorted()), to: channel)
+		// TODO: send the list of rooms to one user
 	}
 
 	private func listUsers(_ channel: Channel) {
-		let users = online.map { $0.name }
-		push(ServerMessage.users(users.sorted()), to: channel)
+		// TODO: send the list of connected users to one user
 	}
 
 	private func message(room: String, text: String, channel: Channel) {
-		guard let user = onlineUser(channel) else {
-			return
-		}
-		let message = ServerMessage.message(room: room, username: user.name, text: text)
-		online.forEach { user in self.push(message, to: user.channel) }
+		// TODO: send a message from a user in a public room to all connected users
 	}
 
 	private func privateMessage(to: String, text: String, channel: Channel) {
-		guard let fromUser = onlineUser(channel),
-			let toUser = online.first(where: { $0.name == to }) else {
-				return
-		}
-		let message = ServerMessage.privateMessage(from: fromUser.name, to: toUser.name, text: text)
-		push(message, to: toUser.channel)
-		push(message, to: fromUser.channel)
+		// TODO: send a private message from one connected user to another
 	}
 }
