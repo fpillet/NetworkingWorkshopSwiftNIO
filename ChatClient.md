@@ -45,14 +45,20 @@ Create the [`NWConnection`](https://developer.apple.com/documentation/network/nw
 
 ## Task 3: write the code that sends packets
 
-An easy task (as is the rest of this project), you'll fill in the `sendUnframed(command:)` function which sends raw JSON data to the server. But you may want to directly fill in the `sendFramed(command:)` method which sends a JSON packet prefixed with an `UInt32` (big endian) the gives the size of the JSON data. This is to deal with TCP packet fragmentation on the receiving side.
+An easy task (as is the rest of this project), you'll fill in the `sendUnframed(command:)` function which sends raw JSON data to the server. 
 
-Filling both method will give you a sense of a very useful distinction in Network.framework: the ability to indicate when the content you are sending is complete, even when you write multiple chunks.
 
 ## Task 4: write the code that receives messages from the server
 
 Reading messages from the server is slightly more involved than writig, but not much. Again you'll appreciate the simplicity of the Network.framework API which really is a joy to work with. Make sure you feel in both the `readNextUnframedMessage(_:)` and `readNextFrameMessage(_:)` methods to first understand the basic of asynchronous reads in Network.framework, and learn how you split multiple reads and chain them together.
 
-## Uber-challenge: write the iOS side with Swift-NIO and NIOTransportServices!
+## Task 5: move to a framed packet model
 
-Although no solution to this challenge is presented here, if you worked on the Swift-NIO side of the project with the server you may understand it well enough to write the client side with Swift-NIO and maybe reuse some of the channel handlers you prepared for the server!
+One issue with TCP is packet fragmentation: your JSON may not always arrive in a single chunk, depending on how packets get fragmented along the way. To deal with this, we are going to **frame** our JSON: write a small 4-byte header that gives the size of the following JSON data.
+
+To that end, fill in the fill in the `sendFramed(command:)` method which sends a JSON packet prefixed with an `UInt32` (big endian) with the size of the following  JSON data. An easy way to deal with this is to make two successive writes, indicating that the second one is "complete".
+
+Similarly, fill in the `readNextFramedMessage(_:)` method to first read the 4 bytes of the header then read the rest of the data. You'll learn how to read fragmented data.
+
+Before testing, in the Server project you'll want to open the `ServerMain.swift` file and uncomment the line that adds the `FramedMessageCodec`!  Ask me when you reach this stage.
+

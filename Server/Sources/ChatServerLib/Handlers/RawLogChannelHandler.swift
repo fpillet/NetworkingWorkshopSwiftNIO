@@ -1,6 +1,8 @@
 import Foundation
 import NIO
 
+// This example channel handlers prints incoming and outgoing ByteBuffer contents
+
 public final class RawLogChannelHandler: ChannelInboundHandler, ChannelOutboundHandler {
 	public typealias InboundIn = ByteBuffer
 	public typealias InboundOut = ByteBuffer

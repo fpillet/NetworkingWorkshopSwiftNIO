@@ -11,11 +11,12 @@ import ChatCommon
 
 // The main functionality of this server
 
-// TODO: make it a handle for IN and OUT data
+// TODO: make it a handler for IN and OUT data
 
-public final class ServerChatRoomsHandler {
+public final class ServerChatRoomsHandler: ChannelInboundHandler, ChannelOutboundHandler {
 
-	// TODO: define the IN and OUT types
+	public typealias InboundIn = ClientCommand
+	public typealias OutboundIn = ServerMessage
 
 	// storage for our helper functions
 	private var online = Set<ChatUser>()
@@ -30,35 +31,57 @@ public final class ServerChatRoomsHandler {
 	// TODO: handle the case of a disconnected client to update the list of online users
 
 	/*
- 	 * Helper functions -- Use them to speed up your development!
- 	 *
-	 */
+	* Helper functions
+	*
+	*/
+
 	private func onlineUser(_ channel: Channel) -> ChatUser? {
 		let uniqueIdentifier = ObjectIdentifier(channel)
 		return online.first { $0.uniqueIdentifier == uniqueIdentifier }
 	}
 
 	private func userConnected(name: String, channel: Channel) {
-		// TODO: upon connection, user should receivce the list of rooms and the list of connected users
+		let uniqueIdentifier = ObjectIdentifier(channel)
+		online.insert(ChatUser(name: name, channel: channel, uniqueIdentifier: uniqueIdentifier))
+		listRooms(channel)
+		for user in online {
+			listUsers(user.channel)
+		}
 	}
 
 	private func userDisconnected(_ channel: Channel) {
-		// TODO: update the list of connected users for all remaining users
+		if let user = onlineUser(channel) {
+			online.remove(user)
+			for user in online {
+				listUsers(user.channel)
+			}
+		}
 	}
 
 	private func listRooms(_ channel: Channel) {
-		// TODO: send the list of rooms to one user
+		push(ServerMessage.rooms(rooms.sorted()), to: channel)
 	}
 
 	private func listUsers(_ channel: Channel) {
-		// TODO: send the list of connected users to one user
+		let users = online.map { $0.name }
+		push(ServerMessage.users(users.sorted()), to: channel)
 	}
 
 	private func message(room: String, text: String, channel: Channel) {
-		// TODO: send a message from a user in a public room to all connected users
+		guard let user = onlineUser(channel) else {
+			return
+		}
+		let msg = ServerMessage.message(room: room, username: user.name, text: text)
+		online.forEach { user in self.push(msg, to: user.channel) }
 	}
 
 	private func privateMessage(to: String, text: String, channel: Channel) {
-		// TODO: send a private message from one connected user to another
+		guard let fromUser = onlineUser(channel),
+			let toUser = online.first(where: { $0.name == to }) else {
+				return
+		}
+		let message = ServerMessage.privateMessage(from: fromUser.name, to: toUser.name, text: text)
+		push(message, to: toUser.channel)
+		push(message, to: fromUser.channel)
 	}
 }

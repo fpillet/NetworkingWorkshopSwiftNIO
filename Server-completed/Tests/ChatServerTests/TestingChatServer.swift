@@ -20,7 +20,7 @@ func setupChatServer(rooms: [String]) -> (MultiThreadedEventLoopGroup, Channel) 
 		.serverChannelOption(ChannelOptions.socket(SocketOptionLevel(SOL_SOCKET), SO_REUSEADDR), value: 1)
 		.childChannelInitializer { channel in
 			channel.pipeline.addHandlers([
-				//FramedMessageCodec(),
+				FramedMessageCodec(),
 				ClientCommandDecoderChannelHandler(),
 				ServerMessageEncoderChannelHandler(),
 				globalChatHandler], first: true)
