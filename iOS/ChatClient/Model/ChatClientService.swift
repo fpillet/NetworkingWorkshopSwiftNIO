@@ -26,7 +26,7 @@ final class ChatClientService {
 	}
 
 	func send(command: ClientCommand) {
-		sendFramed(command: command)
+		sendUnframed(command: command)
 	}
 
 	private func sendUnframed(command: ClientCommand) {

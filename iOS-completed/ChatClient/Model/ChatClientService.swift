@@ -119,7 +119,7 @@ final class ChatClientService {
 	}
 
 	private func readNextMessage(_ connection: NWConnection) {
-		readNextFramedMessage(connection)
+		readNextUnframedMessage(connection)
 	}
 
 	private func readNextUnframedMessage(_ connection: NWConnection) {
