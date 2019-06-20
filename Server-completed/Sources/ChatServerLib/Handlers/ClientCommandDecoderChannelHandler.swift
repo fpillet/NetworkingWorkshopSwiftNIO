@@ -8,11 +8,11 @@ public final class ClientCommandDecoderChannelHandler: ChannelInboundHandler {
 
 	public init() { }
 
-	public func channelRead(ctx: ChannelHandlerContext, data: NIOAny) {
+	public func channelRead(context: ChannelHandlerContext, data: NIOAny) {
 		var buffer = unwrapInboundIn(data)
 		let data = Data(buffer.readBytes(length: buffer.readableBytes)!)
 		if let command = try? JSONDecoder().decode(ClientCommand.self, from: data) {
-			ctx.fireChannelRead(self.wrapInboundOut(command))
+			context.fireChannelRead(self.wrapInboundOut(command))
 		}
 	}
 }

@@ -15,12 +15,13 @@ public final class ClientCommandEncoderChannelHandler: MessageToByteEncoder {
 
 	public init() { }
 
-	public func encode(ctx: ChannelHandlerContext, data: ClientCommand, out: inout ByteBuffer) throws {
+	public func encode(data: ClientCommand, out: inout ByteBuffer) throws {
 		do {
 			let dataBytes = try JSONEncoder().encode(data)
-			out.write(dataBytes)
+			out.writeBytes(dataBytes)
 		} catch let err {
 			print("** Failed encoding ClientCommand to JSON. Err=\(err)\nMessage=\(data)")
 		}
 	}
 }
+

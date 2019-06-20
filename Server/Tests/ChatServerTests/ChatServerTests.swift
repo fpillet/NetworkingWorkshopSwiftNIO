@@ -46,7 +46,7 @@ final class ChatServerTests: XCTestCase {
 
 		try client.send(.message(room: "room1", text: "Hello, world")).wait()
 
-		let broadcast = try client.expect().wait()
+		let broadcast = try client.expect(1).wait()
 		XCTAssertEqual(broadcast, [.message(room: "room1", username: "Jim", text: "Hello, world")])
 	}
 
@@ -62,10 +62,10 @@ final class ChatServerTests: XCTestCase {
 
 		try john.send(.message(room: "room1", text: "Hello, world")).wait()
 
-		let broadcast1 = try jim.expect().wait()
+		let broadcast1 = try jim.expect(1).wait()
 		XCTAssertEqual(broadcast1, [.message(room: "room1", username: "John", text: "Hello, world")])
 
-		let broadcast2 = try john.expect().wait()
+		let broadcast2 = try john.expect(1).wait()
 		XCTAssertEqual(broadcast2, [.message(room: "room1", username: "John", text: "Hello, world")])
 	}
 

@@ -21,7 +21,11 @@ public func startServer(rooms: [String]) -> (MultiThreadedEventLoopGroup, Channe
 		// Bind server to the receiving port to start listening
 		// TODO: bind server
 
-		print("Server running - listening on port \(String(describing: chatServer.localAddress))")
+		if let localAddress = chatServer.localAddress {
+			print("Server running - listening on port \(localAddress)")
+		} else {
+			print("Inconsistency: server supposed to be started by no local address is available")
+		}
 		return (group, chatServer)
 	}
 	catch let err {

@@ -12,7 +12,7 @@ For this project you'll work in the `Server` directory. If you're stuck or want 
 
 ## Prelude: environment setup
 
-The chat server relies on Swift-NIO, which can be obtained using the Swift Package Manager. Firer up a terminal, `cd` to the `Server` folder and run these commands:
+The chat server relies on Swift-NIO, which can be obtained using the Swift Package Manager. Fire up a terminal, `cd` to the `Server` folder and run these commands:
 
 `$ swift package update`
 

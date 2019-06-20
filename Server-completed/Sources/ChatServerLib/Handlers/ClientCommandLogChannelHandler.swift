@@ -10,7 +10,7 @@ public final class ClientCommandLogChannelHandler: ChannelInboundHandler {
 
 	public init() {}
 
-	public func channelRead(ctx: ChannelHandlerContext, data: NIOAny) {
+	public func channelRead(context: ChannelHandlerContext, data: NIOAny) {
 		// unwrap data to ClientCommand
 		let command = unwrapInboundIn(data)
 
@@ -21,7 +21,7 @@ public final class ClientCommandLogChannelHandler: ChannelInboundHandler {
 
 		// log the command
 		let source: String
-		if username.isEmpty, let remote = ctx.remoteAddress {
+		if username.isEmpty, let remote = context.remoteAddress {
 			source = remote.description
 		} else {
 			source = username
@@ -30,6 +30,6 @@ public final class ClientCommandLogChannelHandler: ChannelInboundHandler {
 		print("Received from \(source): \(command)")
 
 		// carry on to next handler
-		ctx.fireChannelRead(data)
+		context.fireChannelRead(data)
 	}
 }

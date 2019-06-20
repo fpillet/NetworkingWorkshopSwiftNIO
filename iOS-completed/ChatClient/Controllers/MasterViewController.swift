@@ -1,11 +1,3 @@
-//
-//  MasterViewController.swift
-//  ChatClient
-//
-//  Created by Florent Pillet on 22/11/2018.
-//  Copyright © 2018 SwiftAlps. All rights reserved.
-//
-
 import UIKit
 
 class MasterViewController: UITableViewController {
@@ -26,6 +18,7 @@ class MasterViewController: UITableViewController {
 		switch message {
 		case .rooms, .users:
 			updateRoomsAndUsers()
+			// TODO: more stuff ?
 
 		default:
 			break
@@ -95,26 +88,19 @@ class MasterViewController: UITableViewController {
 	}
 
 	override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-		let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
-		if indexPath.section == 0 {
-			let name = rooms[indexPath.row].displayName
-			cell.textLabel!.text = "#\(name)"
-		} else {
-			let name = users[indexPath.row].displayName
-			cell.textLabel!.text = "@\(name)"
+		let closure = { (tableView: UITableView, indexPath: IndexPath) -> UITableViewCell in
+			let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
+			if indexPath.section == 0 {
+				let name = self.rooms[indexPath.row].displayName
+				cell.textLabel!.text = "#\(name)"
+			} else {
+				let name = self.users[indexPath.row].displayName
+				cell.textLabel!.text = "@\(name)"
+			}
+			return cell
 		}
+		let cell = closure(tableView, indexPath)
 		return cell
-	}
-
-	override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-		let label = UILabel()
-		label.text = (section == 0) ? " Rooms" : " Users"
-		label.textColor = UIColor.darkGray
-		return label
-	}
-
-	override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-		return 40.0
 	}
 }
 

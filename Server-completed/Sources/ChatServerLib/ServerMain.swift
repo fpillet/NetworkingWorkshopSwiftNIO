@@ -18,12 +18,13 @@ public func startServer(rooms: [String]) -> (MultiThreadedEventLoopGroup, Channe
 
 		// Set the handlers that are applied to the accepted Channels
 		.childChannelInitializer { channel in channel.pipeline.addHandlers([
-			//FramedMessageCodec(),
+//			MessageToByteHandler(FramedMessageEncoder()),
+//			ByteToMessageHandler(FramedMessageDecoder()),
 			RawLogChannelHandler(),
 			ClientCommandDecoderChannelHandler(),
 			ClientCommandLogChannelHandler(),
-			ServerMessageEncoderChannelHandler(),
-			globalChatHandler], first: true)
+			MessageToByteHandler(ServerMessageEncoder()),
+			globalChatHandler], position: .first)
 		}
 
 		// Enable TCP_NODELAY and SO_REUSEADDR for the accepted Channels
@@ -34,7 +35,11 @@ public func startServer(rooms: [String]) -> (MultiThreadedEventLoopGroup, Channe
 
 	do {
 		let chatServer = try bootstrap.bind(host: "::1", port: 9999).wait()
-		print("Server running - listening on port \(String(describing: chatServer.localAddress))")
+		if let localAddress = chatServer.localAddress {
+			print("Server running - listening on port \(localAddress)")
+		} else {
+			print("Inconsistency: server supposed to be started by no local address is available")
+		}
 		return (group, chatServer)
 	}
 	catch let err {

@@ -3,9 +3,5 @@ project 'ChatClient.xcodeproj'
 
 target 'ChatClient' do
 	use_frameworks!
-
-	# Ruby get the absolute path of the Common folder
-	# common_folder = File.expand_path("../Common", File.dirname(__FILE__))
-
 	pod 'MessengerKit', :git => 'https://github.com/steve228uk/MessengerKit.git'
 end

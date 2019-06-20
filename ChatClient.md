@@ -6,7 +6,7 @@ The client for our chat solution is an iOS application (albeit a simple one, des
 
 The server will accept commands from clients applications that connect to it. It holds the chat rooms, dispatches the messages sent by clients, and supports direct messages between clients.
 
-To talk to the server, you'll use Network.framework's new API, available in iOS 12, tvOS 12 and macOS Mojave.
+To talk to the server, you'll use Network.framework's new API, available starting from iOS 12, tvOS 12 and macOS Mojave.
 
 For this project you'll work in the `iOS` directory. If you're stuck or want to check out a hint, the completed project is in the `iOS-Complete` folder.
 

@@ -27,9 +27,9 @@ public final class ServerChatRoomsHandler: ChannelInboundHandler, ChannelOutboun
 		self.rooms = rooms
 	}
 
-	public func channelRead(ctx: ChannelHandlerContext, data: NIOAny) {
+	public func channelRead(context: ChannelHandlerContext, data: NIOAny) {
 		let clientCommand = unwrapInboundIn(data)
-		let channel = ctx.channel
+		let channel = context.channel
 		syncQueue.async {
 			switch clientCommand {
 				case .connect(let username):
@@ -45,18 +45,18 @@ public final class ServerChatRoomsHandler: ChannelInboundHandler, ChannelOutboun
 
 		// since we implemented the method, we need to carry the callback
 		// over to the next handler in the pipeline
-		ctx.fireChannelRead(data)
+		context.fireChannelRead(data)
 	}
 
-	public func channelInactive(ctx: ChannelHandlerContext) {
+	public func channelInactive(context: ChannelHandlerContext) {
 		// in case client didn't send is a `disconnect`, make sure we remove
 		// user from the rooms it was in, and notify others
-		let channel = ctx.channel
+		let channel = context.channel
 		syncQueue.async { self.userDisconnected(channel) }
 
 		// since we implemented the method, we need to carry the callback
 		// over to the next handler in the pipeline
-		ctx.fireChannelInactive()
+		context.fireChannelInactive()
 	}
 
 	private func push(_ data: ServerMessage, to channel: Channel) {

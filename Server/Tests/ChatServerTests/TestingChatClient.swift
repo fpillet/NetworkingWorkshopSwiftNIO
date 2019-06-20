@@ -13,7 +13,7 @@ fileprivate final class ServerMessageRecorder: ChannelInboundHandler {
 		self.recorder = recorder
 	}
 
-	func channelRead(ctx: ChannelHandlerContext, data: NIOAny) {
+	func channelRead(context: ChannelHandlerContext, data: NIOAny) {
 		recorder(unwrapInboundIn(data))
 	}
 }
@@ -35,17 +35,21 @@ final class ChatClient {
 			.channelOption(ChannelOptions.socket(SocketOptionLevel(SOL_SOCKET), SO_REUSEADDR), value: 1)
 			.channelInitializer { channel in
 				channel.pipeline.addHandlers([
-					//FramedMessageCodec(),
+					MessageToByteHandler(FramedMessageEncoder()),
+					ByteToMessageHandler(FramedMessageDecoder()),
 					ServerMessageDecoderChannelHandler()
-					], first: true)
+					], position: .first)
 		}
 		return bootstrap.connect(host: host, port: port)
-			.then { channel in
+			.flatMap { channel in
 				let client = ChatClient.init(channel: channel)
-				let future = channel.eventLoop.newSucceededFuture(result: client)
+				let future = channel.eventLoop.makeSucceededFuture(client)
+				let recorder = ServerMessageRecorder(recorder: { [weak client] message in client?.record(message: message) })
 				return channel.pipeline
-					.add(handler: ServerMessageRecorder(recorder: { [weak client] message in client?.record(message: message) }))
-					.then { future }
+					.addHandler(recorder)
+					.flatMap {
+						future
+				}
 		}
 	}
 
@@ -54,7 +58,7 @@ final class ChatClient {
 	}
 
 	func close() throws {
-		let promise: EventLoopPromise<Void> = channel.eventLoop.newPromise()
+		let promise: EventLoopPromise<Void> = channel.eventLoop.makePromise()
 		channel.close(promise: promise)
 		try promise.futureResult.wait()
 	}
@@ -70,7 +74,7 @@ final class ChatClient {
 		defer { lock.unlock() }
 		if !expectations.isEmpty {
 			let promise = expectations.removeFirst()
-			promise.succeed(result: message)
+			promise.succeed(message)
 		} else {
 			backlog.append(message)
 		}
@@ -79,7 +83,7 @@ final class ChatClient {
 	func expect(_ count: Int = 1, timeout: Int = 1) -> EventLoopFuture<[ServerMessage]> {
 		return EventLoopFuture.reduce(into: [ServerMessage](),
 									  (0 ..< count).map { _ in expect(timeout: timeout) },
-									  eventLoop: channel.eventLoop) { ( array:inout [ServerMessage], message: ServerMessage) in
+									  on: channel.eventLoop) { ( array:inout [ServerMessage], message: ServerMessage) in
 			array.append(message)
 		}
 	}
@@ -92,13 +96,17 @@ final class ChatClient {
 		lock.lock()
 		defer { lock.unlock() }
 		if !backlog.isEmpty {
-			return channel.eventLoop.newSucceededFuture(result: backlog.removeFirst())
+			return channel.eventLoop.makeSucceededFuture(backlog.removeFirst())
 		}
-		let promise: EventLoopPromise<ServerMessage> = channel.eventLoop.newPromise()
+		let promise: EventLoopPromise<ServerMessage> = channel.eventLoop.makePromise()
 		expectations.append(promise)
-		let timeoutTask = channel.eventLoop.scheduleTask(in: .seconds(timeout)) { promise.fail(error: ChatClientError.responseTimeout) }
+		let timeoutTask = channel.eventLoop.scheduleTask(in: .seconds(Int64(timeout))) {
+			promise.fail(ChatClientError.responseTimeout)
+		}
 		let future = promise.futureResult
-		future.whenComplete { timeoutTask.cancel() }
+		future.whenComplete { _ in
+			timeoutTask.cancel()
+		}
 		return future
 	}
 }

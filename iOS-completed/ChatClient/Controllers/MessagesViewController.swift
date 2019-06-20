@@ -115,7 +115,7 @@ extension MessagesViewController: MSGDataSource {
 	}
 
 	func footerTitle(for section: Int) -> String? {
-		return "Just now"
+		return ""
 	}
 
 	func headerTitle(for section: Int) -> String? {

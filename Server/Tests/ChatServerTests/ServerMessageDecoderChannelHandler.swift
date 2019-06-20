@@ -8,7 +8,7 @@ public final class ServerMessageDecoderChannelHandler: ChannelInboundHandler {
 
 	public init() { }
 
-	public func channelRead(ctx: ChannelHandlerContext, data: NIOAny) {
+	public func channelRead(context: ChannelHandlerContext, data: NIOAny) {
 		var buffer = unwrapInboundIn(data)
 		let message = buffer.withUnsafeMutableReadableBytes { (pointer: UnsafeMutableRawBufferPointer) -> ServerMessage? in
 			guard let baseAddress = pointer.baseAddress else {
@@ -24,7 +24,7 @@ public final class ServerMessageDecoderChannelHandler: ChannelInboundHandler {
 			return nil
 		}
 		if let message = message {
-			ctx.fireChannelRead(self.wrapInboundOut(message))
+			context.fireChannelRead(self.wrapInboundOut(message))
 		}
 	}
 }

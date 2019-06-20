@@ -26,9 +26,17 @@ public final class ServerChatRoomsHandler: ChannelInboundHandler, ChannelOutboun
 		self.rooms = rooms
 	}
 
-	// TODO: receive and process ClientCommand from clients
+	public func channelRead(context: ChannelHandlerContext, data: NIOAny) {
+		
+		// TODO: implement channelRead() receive and process ClientCommand from clients
+	
+	}
 
-	// TODO: handle the case of a disconnected client to update the list of online users
+	public func channelInactive(context: ChannelHandlerContext) {
+
+		// TODO: implement channelInactive() handle the case of a disconnected client to update the list of online users
+
+	}
 
 	/*
 	* Helper functions
