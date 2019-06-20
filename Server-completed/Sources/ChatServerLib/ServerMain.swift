@@ -18,8 +18,8 @@ public func startServer(rooms: [String]) -> (MultiThreadedEventLoopGroup, Channe
 
 		// Set the handlers that are applied to the accepted Channels
 		.childChannelInitializer { channel in channel.pipeline.addHandlers([
-//			MessageToByteHandler(FramedMessageEncoder()),
-//			ByteToMessageHandler(FramedMessageDecoder()),
+			MessageToByteHandler(FramedMessageEncoder()),
+			ByteToMessageHandler(FramedMessageDecoder()),
 			RawLogChannelHandler(),
 			ClientCommandDecoderChannelHandler(),
 			ClientCommandLogChannelHandler(),
