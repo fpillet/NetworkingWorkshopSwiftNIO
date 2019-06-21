@@ -22,6 +22,8 @@ then
 
 A new `ChatServer.xcodeproj` project will appear in the Server folder.
 
+You will also need a client to connect from. In the `iOS-Completed` folder you'll find a working client. Make sure you `pod install` first then open the workspace and run the project.
+
 ## Introduction: understanding Swift-NIO's general model
 
 Let's discuss Swift-NIO architecture! The introduction on the repository states that:
@@ -72,7 +74,18 @@ Next, open `ServerMessageEncoderChannelHandler.swift` to code the outgoing handl
 
 ## Task 4: insert the encoder and decoder handlers in the pipeline
 
-Now that you have encoder and decoder handlers, insert them in the pipeline. The client command decoder must be after the `RawLogChannelHandler`, which takes a `ByteBuffer` for input.
+Now that you have encoder and decoder handlers, insert them in the pipeline.
+
+First the pipeline need to include the framing encoder and decoders which guarantee that we have a proper envelope around our packets. You'll want to add this to the pipeline first:
+
+```
+MessageToByteHandler(FramedMessageEncoder()),
+ByteToMessageHandler(FramedMessageDecoder()),
+```
+
+Next you add a `RawLogChannelHandler`, which takes a `ByteBuffer` for input.
+
+Finally add the `ClientCommandDecoderChannelHandler` and `ClientCommandEncoderChannelHandler`.
 
 While you're at it, after the `ClientCommandDecoderChannelHandler` you can add the `ClientCommandLogChannelHandler` (already written) that will log properly decoded client commands.
 

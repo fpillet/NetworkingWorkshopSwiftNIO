@@ -7,7 +7,7 @@ public func startServer(rooms: [String]) -> (MultiThreadedEventLoopGroup, Channe
 	// according to the number of cores your computer has, or simply use a hardcoded value. Remember that each
 	// thread (each EventLoop) can support a large number of connections!
 
-	// TODO: create your EventLoopFrom
+	// TODO: create your EventLoopGroup
 
 	// We're going to use a single instance
 	// to handle chat exchanges between participants
