@@ -10,11 +10,11 @@ enum FramingError: Error {
 public struct FramedMessageEncoder: MessageToByteEncoder {
 	public typealias OutboundIn = ByteBuffer
 	public typealias OutboundOut = ByteBuffer
-	
+
 	public init() { }
-	
+
 	// MessageToByteEncoder
-	
+
 	public func encode(data: ByteBuffer, out: inout ByteBuffer) throws {
 		out.writeInteger(Int32(data.readableBytes), endianness: .big)
 		data.withUnsafeReadableBytes { (p) in
