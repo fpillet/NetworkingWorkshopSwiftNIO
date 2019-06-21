@@ -13,7 +13,7 @@ import ChatCommon
 
 public final class ServerChatRoomsHandler: ChannelInboundHandler, ChannelOutboundHandler {
 	public typealias InboundIn = ClientCommand
-	public typealias InboundOut = ClientCommand
+	public typealias InboundOut = Never
 
 	public typealias OutboundIn = Never
 	public typealias OutboundOut = ServerMessage
@@ -43,9 +43,8 @@ public final class ServerChatRoomsHandler: ChannelInboundHandler, ChannelOutboun
 			}
 		}
 
-		// since we implemented the method, we need to carry the callback
-		// over to the next handler in the pipeline
-		context.fireChannelRead(data)
+		// we are a terminal handler for incoming messages so don't propagate it to a next handler
+		// (but we could for completeness)
 	}
 
 	public func channelInactive(context: ChannelHandlerContext) {

@@ -69,7 +69,7 @@ Remember that data goes **in** but also needs to get carried **out** to the next
 
 Open the `ClientCommandDecoderChannelHandler.swift` file to get going with the incoming data decoder that decodes the contents of an incoming `ByteBuffer` into `ClientCommand` and passes it to the next handler in the pipeline.
 
-Next, open `ServerMessageEncoderChannelHandler.swift` to code the outgoing handler. Notice that this time, it will adopt the `MessageToByteEncoder` protocol, worth to know about! 
+Next, open `ServerMessageEncoder.swift` to code the outgoing handler. Notice that this time, it will adopt the `MessageToByteEncoder` protocol, worth to know about! 
 
 
 ## Task 4: insert the encoder and decoder handlers in the pipeline

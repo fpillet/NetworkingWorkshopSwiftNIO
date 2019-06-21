@@ -16,7 +16,12 @@ import ChatCommon
 public final class ServerChatRoomsHandler: ChannelInboundHandler, ChannelOutboundHandler {
 
 	public typealias InboundIn = ClientCommand
+	public typealias InboundOut = Never
+	
+	public typealias OutboundIn = Never
 	public typealias OutboundOut = ServerMessage
+
+	private let syncQueue = DispatchQueue(label: "syncQueue")
 
 	// storage for our helper functions
 	private var online = Set<ChatUser>()
@@ -27,9 +32,25 @@ public final class ServerChatRoomsHandler: ChannelInboundHandler, ChannelOutboun
 	}
 
 	public func channelRead(context: ChannelHandlerContext, data: NIOAny) {
-		
-		// TODO: implement channelRead() receive and process ClientCommand from clients
-	
+		let clientCommand = unwrapInboundIn(data)
+
+		let channel = context.channel
+
+		syncQueue.async {
+			switch clientCommand {
+			case .connect(let username):
+				self.userConnected(name: username, channel: channel)
+			case .disconnect:
+				self.userDisconnected(channel)
+			case .message(let room, let text):
+				self.message(room: room, text: text, channel: channel)
+			case .privateMessage(let username, let text):
+				self.privateMessage(to: username, text: text, channel: channel)
+			}
+		}
+
+		// we are a terminal handler for incoming messages so don't propagate it to a next handler
+		// (but we could for completeness)
 	}
 
 	public func channelInactive(context: ChannelHandlerContext) {
