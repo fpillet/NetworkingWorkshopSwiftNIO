@@ -10,6 +10,12 @@ To talk to the server, you'll use Network.framework's new API, available startin
 
 For this project you'll work in the `iOS` directory. If you're stuck or want to check out a hint, the completed project is in the `iOS-Complete` folder.
 
+## You need a running server
+
+Open `Server-Completed`, then from the terminal do a `swift package update` and `swift package generate-xcodeproj`.
+
+Open the generated project and run it. You should have a server ready to accept connections.
+
 ## Introduction: the simplicity and versatility of Network.framework
 
 Let's discuss Network.framework! It' sa powerful networking API which provides a small but powerful API surface.
@@ -35,30 +41,41 @@ Make sure you have CocoaPods install:
 Then simply update pods from within the iOS folder:
 `$ pod update`
 
-## Task 1: setup the necessary bits for NWConnection
+## All work is done in `ChatClientService.swift`
+
+## Task 1: prepare the `serverEndpoint` variable in `init`
 
 You'll need to create an endpoint ([`NWEndpoint`](https://developer.apple.com/documentation/network/nwendpoint)) that describes the server location, and prepare a dispatch queue for your connection to run on. This is done in `init` and above.
 
 ## Task 2: fill in the `connect()` method
 
-Create the [`NWConnection`](https://developer.apple.com/documentation/network/nwconnection) object you need in the `connect()` method. Setup a connection state handler by filling the `setupConnectionStateHandler(_:)` method. You'll learn about the various states a connection can be in.
+Create the [`NWConnection`](https://developer.apple.com/documentation/network/nwconnection) object you need in the `connect()` method.
 
-## Task 3: write the code that sends packets
+Follow the TODO items to fill in the code.
 
-An easy task (as is the rest of this project), you'll fill in the `sendUnframed(command:)` function which sends raw JSON data to the server. 
+## Task 3: fill in the `setupConnectionStateHandler(_:)` function
+
+Setup a connection state handler by filling the `setupConnectionStateHandler(_:)` method. You'll learn about the various states a connection can be in.
+
+Follow the TODO items to fill in the code.
+
+## Task 4: write the code that sends messages to the server
+
+Fill in the `send(command:)` function following the TODO items.
+
+One issue with TCP is packet fragmentation: your JSON may not always arrive in a single chunk, depending on how packets get fragmented along the way. To deal with this, we are going to **frame** our JSON:
+
+1. encode your command to JSON using Codable's `JSONEncoder`
+2. prepare a `UInt32` value with the size of the encoded JSON data
+3. make the value `bigEndian` (`value.bigEndian`) as the server expects a big endian value
+4. send the 4-byte header
+5. send the JSON data itself
 
 
-## Task 4: write the code that receives messages from the server
+## Task 5: write the code that receives messages from the server
 
-Reading messages from the server is slightly more involved than writig, but not much. Again you'll appreciate the simplicity of the Network.framework API which really is a joy to work with. Make sure you feel in both the `readNextUnframedMessage(_:)` and `readNextFrameMessage(_:)` methods to first understand the basic of asynchronous reads in Network.framework, and learn how you split multiple reads and chain them together.
+Reading messages from the server is slightly more involved than writing, but not much.
 
-## Task 5: move to a framed packet model
+Again you'll appreciate the simplicity of the Network.framework API which really is a joy to work with.
 
-One issue with TCP is packet fragmentation: your JSON may not always arrive in a single chunk, depending on how packets get fragmented along the way. To deal with this, we are going to **frame** our JSON: write a small 4-byte header that gives the size of the following JSON data.
-
-To that end, fill in the fill in the `sendFramed(command:)` method which sends a JSON packet prefixed with an `UInt32` (big endian) with the size of the following  JSON data. An easy way to deal with this is to make two successive writes, indicating that the second one is "complete".
-
-Similarly, fill in the `readNextFramedMessage(_:)` method to first read the 4 bytes of the header then read the rest of the data. You'll learn how to read fragmented data.
-
-Before testing, in the Server project you'll want to open the `ServerMain.swift` file and uncomment the line that adds the `FramedMessageCodec`!  Ask me when you reach this stage.
-
+Fill in the `readNextMessage(_:)`  function, following the TODO items.
